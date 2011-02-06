@@ -10,9 +10,14 @@ doc
 
 # bundler
 .bundle
+Gemfile.lock
 
 # jeweler generated
 pkg
+
+# test files
+spec/*.log
+spec/*.sqlite3
 
 # Have editor/IDE/OS specific files you need to ignore? Consider using a global gitignore: 
 #
