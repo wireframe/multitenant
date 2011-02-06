@@ -11,7 +11,8 @@ module Lockdown
     def lock(options = {}, &block)
       locked.merge! options
     end
-    def unlock(*args)
+    def unlock
+      locked.clear
     end
   end
 

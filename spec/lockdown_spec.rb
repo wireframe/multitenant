@@ -33,6 +33,14 @@ describe "Lockdown" do
     it { Lockdown.locked[:company].should == @company }
   end
 
+  describe 'Lockdown.unlock' do
+    before do
+      Lockdown.lock :foo => 'test'
+      Lockdown.unlock
+    end
+    it { Lockdown.locked.should == {} }
+  end
+
   describe 'User.all when locked to one company' do
     before do
       @company = Company.create!(:name => 'foo')
