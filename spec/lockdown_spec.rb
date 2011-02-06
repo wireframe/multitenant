@@ -17,7 +17,7 @@ end
 
 class User < ActiveRecord::Base
   belongs_to :company
-  lock_me_down
+  lock_me_down :company
 end
 
 describe "Lockdown" do

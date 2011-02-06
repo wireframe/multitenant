@@ -16,11 +16,11 @@ module Lockdown
   end
 
   module LockMeDown
-    def lock_me_down
+    def lock_me_down(association)
       include DynamicDefaultScoping
       default_scope :locked_down, lambda {
-        return {} unless Lockdown.locked[:company]
-        where({:company_id => Lockdown.locked[:company].id}) 
+        return {} unless Lockdown.locked[association]
+        where({"#{association}_id" => Lockdown.locked[association].id}) 
       }
     end
   end
