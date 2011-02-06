@@ -57,7 +57,18 @@ describe "Lockdown" do
 
 
   describe 'Lockdown.lock with block' do
-    it 'unlocks after block runs'
+    before do
+      @executed = false
+      Lockdown.lock :company => :foo do
+        @executed = true
+      end
+    end
+    it 'unlocks after block runs' do 
+      Lockdown.locked.should == {} 
+    end
+    it 'yields the block' do
+      @executed.should == true
+    end
   end
 
   describe 'Lockdown.lock with block that raises error' do

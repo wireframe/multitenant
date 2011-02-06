@@ -10,6 +10,13 @@ module Lockdown
     end
     def lock(options = {}, &block)
       locked.merge! options
+      if block_given?
+        begin
+          yield
+        ensure
+          unlock
+        end
+      end
     end
     def unlock
       locked.clear
