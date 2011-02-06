@@ -7,17 +7,46 @@ ActiveRecord::Schema.define(:version => 1) do
 
   create_table :users, :force => true do |t|
     t.column :name, :string
+    t.column :company_id, :integer
   end
 end
 
-class Company < ActiveRecord::Base; end
+class Company < ActiveRecord::Base
+  has_many :users
+end
+
+class User < ActiveRecord::Base
+  belongs_to :company
+  lock_me_down
+end
 
 describe "Lockdown" do
+  describe 'Lockdown.locked' do
+    it { Lockdown.locked.should == {} }
+  end
+
   describe 'Lockdown.lock' do
     before do
-      Lockdown.lock :company => Company.create!(:name => 'foo')
+      @company = Company.create!(:name => 'foo')
+      Lockdown.lock :company => @company
     end
+    it { Lockdown.locked[:company].should == @company }
   end
+
+  describe 'User.all when locked to one company' do
+    before do
+      @company = Company.create!(:name => 'foo')
+      @company2 = Company.create!(:name => 'bar')
+
+      @user = @company.users.create! :name => 'bob'
+      @user2 = @company2.users.create! :name => 'tim'
+      Lockdown.lock :company => @company
+      @users = User.lockdown.all
+    end
+    it { @users.length.should == 1 }
+    it { @users.should == [@user] }
+  end
+
 
   describe 'Lockdown.lock with block' do
     it 'unlocks after block runs'
