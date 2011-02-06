@@ -41,7 +41,7 @@ describe "Lockdown" do
       @user = @company.users.create! :name => 'bob'
       @user2 = @company2.users.create! :name => 'tim'
       Lockdown.lock :company => @company
-      @users = User.lockdown.all
+      @users = User.all
     end
     it { @users.length.should == 1 }
     it { @users.should == [@user] }

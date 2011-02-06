@@ -1,7 +1,9 @@
 source "http://rubygems.org"
 # Add dependencies required to use your gem here.
 # Example:
-gem "activerecord", ">= 2.3.5"
+gem "activerecord", "~> 3.0.3"
+gem "activesupport", "~> 3.0.3"
+gem 'dynamic_default_scoping', '~> 0.0.3'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

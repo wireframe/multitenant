@@ -1,4 +1,6 @@
 require 'active_record'
+require 'active_support/all'
+require 'dynamic_default_scoping'
 
 module Lockdown
   class << self
@@ -15,7 +17,8 @@ module Lockdown
 
   module LockMeDown
     def lock_me_down
-      scope :lockdown, lambda {
+      include DynamicDefaultScoping
+      default_scope :locked_down, lambda {
         return {} unless Lockdown.locked[:company]
         where({:company_id => Lockdown.locked[:company].id}) 
       }
