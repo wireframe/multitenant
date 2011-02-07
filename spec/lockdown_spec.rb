@@ -72,8 +72,21 @@ describe "Lockdown" do
   end
 
   describe 'Lockdown.lock with block that raises error' do
-    it 'unlocks after block runs'
-    it 'bubbles exception'
+    before do
+      @executed = false
+      lambda {
+        Lockdown.lock :company => :foo do
+          @executed = true
+          raise 'expected error'
+        end
+      }.should raise_error('expected error')
+    end
+    it 'unlocks after block runs' do 
+      Lockdown.locked.should == {} 
+    end
+    it 'yields the block' do
+      @executed.should == true
+    end
   end
 
 end
