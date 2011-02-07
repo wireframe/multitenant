@@ -1,6 +1,28 @@
-= lockdown
+= Lockdown
 
-Description goes here.
+When building multitenant applications, 
+never let an unscoped Model.all accidentally leak data to an unintended audience.
+
+== Usage
+
+  class User < ActiveRecord::Base
+    belongs_to :company
+    lock_me_down :company
+  end
+
+  Lockdown.lock :company => current_company do
+    # only query users in the current company
+    User.all
+
+    # auto-assign the new user to the locked company
+    User.create :name => 'Bob'
+  end
+
+== Features
+
+* Rails 3 compatible
+* Restrict database queries to only lookup objects for the current owner
+* Auto assign newly created objects to the current owner
 
 == Contributing to lockdown
  
@@ -11,6 +33,10 @@ Description goes here.
 * Commit and push until you are happy with your contribution
 * Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+
+== Credits
+
+Lars Klevan for inspiring this project.
 
 == Copyright
 

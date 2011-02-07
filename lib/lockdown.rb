@@ -27,6 +27,10 @@ module Lockdown
     def lock_me_down(association)
       include DynamicDefaultScoping
       reflection = reflect_on_association association
+      before_validation Proc.new {|m|
+        return unless Lockdown.locked[association]
+        m.send("#{association}=".to_sym, Lockdown.locked[association])
+      }, :on => :create
       default_scope :locked_down, lambda {
         return {} unless Lockdown.locked[association]
         where({reflection.primary_key_name => Lockdown.locked[association].id})

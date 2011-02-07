@@ -21,6 +21,8 @@ class User < ActiveRecord::Base
 end
 
 describe "Lockdown" do
+  after { Lockdown.unlock }
+
   describe 'Lockdown.locked' do
     it { Lockdown.locked.should == {} }
   end
@@ -86,6 +88,18 @@ describe "Lockdown" do
     end
     it 'yields the block' do
       @executed.should == true
+    end
+  end
+
+  describe 'creating new object while locked' do
+    before do
+      @company = Company.create! :name => 'foo'
+      Lockdown.lock :company => @company do
+        @user = User.create! :name => 'jimmy'
+      end
+    end
+    it 'should auto_populate the company' do
+      @user.company_id.should == @company.id
     end
   end
 
