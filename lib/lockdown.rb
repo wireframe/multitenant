@@ -26,9 +26,10 @@ module Lockdown
   module LockMeDown
     def lock_me_down(association)
       include DynamicDefaultScoping
+      reflection = reflect_on_association association
       default_scope :locked_down, lambda {
         return {} unless Lockdown.locked[association]
-        where({"#{association}_id" => Lockdown.locked[association].id}) 
+        where({reflection.primary_key_name => Lockdown.locked[association].id})
       }
     end
   end
