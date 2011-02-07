@@ -15,14 +15,13 @@ Jeweler::Tasks.new do |gem|
   gem.name = "lockdown"
   gem.homepage = "http://github.com/wireframe/lockdown"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "ryan@socialcast.com"
+  gem.summary = %Q{scope database queries to current tenant}
+  gem.description = %Q{never let an unscoped Model.all accidentally leak data to an unintended audience.}
+  gem.email = "ryan@codecrate.com"
   gem.authors = ["Ryan Sonnek"]
-  # Include your dependencies below. Runtime dependencies are required when using your gem,
-  # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
-  #  gem.add_runtime_dependency 'jabber4r', '> 0.1'
-  #  gem.add_development_dependency 'rspec', '> 1.2.3'
+  gem.add_runtime_dependency "activerecord", "~> 3.0.3"
+  gem.add_runtime_dependency "activesupport", "~> 3.0.3"
+  gem.add_runtime_dependency 'dynamic_default_scoping', '~> 0.0.3'
 end
 Jeweler::RubygemsDotOrgTasks.new
 
