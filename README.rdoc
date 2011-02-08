@@ -1,30 +1,31 @@
-= Lockdown
+= Multitenant
 
-When building multitenant applications, 
-never let an unscoped Model.all accidentally leak data to an unintended audience.
+When building multitenant applications, never let an unscoped Model.all accidentally leak data to an unintended audience.
 
 == Usage
 
   class User < ActiveRecord::Base
     belongs_to :company
-    lock_me_down :company
+    belongs_to_tenant :company
   end
 
-  Lockdown.lock :company => current_company do
-    # only query users in the current company
+  Multitenant.with_tenant current_company do
+    # queries within this block are automatically
+    # scoped to the current company
     User.all
 
-    # auto-assign the new user to the locked company
+    # new objects created within this block are automatically
+    # assigned to the current company
     User.create :name => 'Bob'
   end
 
 == Features
 
 * Rails 3 compatible
-* Restrict database queries to only lookup objects for the current owner
-* Auto assign newly created objects to the current owner
+* Restrict database queries to only lookup objects for the current tenant
+* Auto assign newly created objects to the current tenant
 
-== Contributing to lockdown
+== Contributing
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
