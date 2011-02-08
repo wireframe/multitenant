@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{multitenant}
-  s.version = "0.1.0"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Sonnek"]
@@ -24,10 +24,10 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
-    "lib/lockdown.rb",
-    "lockdown.gemspec",
+    "lib/multitenant.rb",
+    "multitenant.gemspec",
     "spec/database.yml",
-    "spec/lockdown_spec.rb",
+    "spec/multitenant_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/wireframe/multitenant}
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.5.0}
   s.summary = %q{scope database queries to current tenant}
   s.test_files = [
-    "spec/lockdown_spec.rb",
+    "spec/multitenant_spec.rb",
     "spec/spec_helper.rb"
   ]
 
