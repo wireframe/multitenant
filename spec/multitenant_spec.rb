@@ -9,15 +9,32 @@ ActiveRecord::Schema.define(:version => 1) do
     t.column :name, :string
     t.column :company_id, :integer
   end
+
+
+  create_table :tenants, :force => true do |t|
+    t.column :name, :string
+  end
+
+  create_table :items, :force => true do |t|
+    t.column :name, :string
+    t.column :tenant_id, :integer
+  end
 end
 
 class Company < ActiveRecord::Base
   has_many :users
 end
-
 class User < ActiveRecord::Base
   belongs_to :company
   belongs_to_tenant :company
+end
+
+class Tenant < ActiveRecord::Base
+  has_many :items
+end
+class Item < ActiveRecord::Base
+  belongs_to :tenant
+  belongs_to_tenant
 end
 
 describe Multitenant do
@@ -76,6 +93,22 @@ describe Multitenant do
     it { @users.length.should == 1 }
     it { @users.should == [@user] }
   end
+
+  describe 'Item.all when current_tenant is set' do
+    before do
+      @tenant = Tenant.create!(:name => 'foo')
+      @tenant2 = Tenant.create!(:name => 'bar')
+
+      @item = @tenant.items.create! :name => 'baz'
+      @item2 = @tenant2.items.create! :name => 'booz'
+      Multitenant.with_tenant @tenant do
+        @items = Item.all
+      end
+    end
+    it { @items.length.should == 1 }
+    it { @items.should == [@item] }
+  end
+
 
   describe 'creating new object when current_tenant is set' do
     before do
