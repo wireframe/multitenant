@@ -5,17 +5,17 @@ When building multitenant applications, never let an unscoped Model.all accident
 == Usage
 
   class User < ActiveRecord::Base
-    belongs_to :company
-    belongs_to_tenant :company
+    belongs_to :tenant
+    belongs_to_tenant
   end
 
-  Multitenant.with_tenant current_company do
+  Multitenant.with_tenant current_tenant do
     # queries within this block are automatically
-    # scoped to the current company
+    # scoped to the current tenant
     User.all
 
     # new objects created within this block are automatically
-    # assigned to the current company
+    # assigned to the current tenant
     User.create :name => 'Bob'
   end
 
