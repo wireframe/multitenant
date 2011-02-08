@@ -2,6 +2,7 @@ require 'active_record'
 require 'active_support/all'
 require 'dynamic_default_scoping'
 
+# Multitenant: making cross tenant data leaks a thing of the past...since 2011
 module Multitenant
   class << self
     attr_accessor :current_tenant
@@ -17,6 +18,8 @@ module Multitenant
   end
 
   module ActiveRecordExtensions
+    # configure the current model to automatically query and populate objects based on the current tenant
+    # see Multitenant#current_tenant
     def belongs_to_tenant(association = :tenant)
       include DynamicDefaultScoping
       reflection = reflect_on_association association
