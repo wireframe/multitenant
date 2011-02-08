@@ -12,8 +12,8 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "lockdown"
-  gem.homepage = "http://github.com/wireframe/lockdown"
+  gem.name = "multitenant"
+  gem.homepage = "http://github.com/wireframe/multitenant"
   gem.license = "MIT"
   gem.summary = %Q{scope database queries to current tenant}
   gem.description = %Q{never let an unscoped Model.all accidentally leak data to an unintended audience.}
@@ -43,7 +43,7 @@ Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "lockdown #{version}"
+  rdoc.title = "multitenant #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end

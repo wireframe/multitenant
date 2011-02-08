@@ -4,7 +4,7 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{lockdown}
+  s.name = %q{multitenant}
   s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
     "spec/lockdown_spec.rb",
     "spec/spec_helper.rb"
   ]
-  s.homepage = %q{http://github.com/wireframe/lockdown}
+  s.homepage = %q{http://github.com/wireframe/multitenant}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.5.0}
