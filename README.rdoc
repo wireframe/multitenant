@@ -6,7 +6,7 @@ When building multitenant applications, never let an unscoped Model.all accident
 
   class User < ActiveRecord::Base
     belongs_to :tenant
-    belongs_to_tenant
+    belongs_to_multitenant
   end
 
   Multitenant.with_tenant current_tenant do

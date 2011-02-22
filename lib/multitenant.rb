@@ -20,7 +20,7 @@ module Multitenant
   module ActiveRecordExtensions
     # configure the current model to automatically query and populate objects based on the current tenant
     # see Multitenant#current_tenant
-    def belongs_to_tenant(association = :tenant)
+    def belongs_to_multitenant(association = :tenant)
       include DynamicDefaultScoping
       reflection = reflect_on_association association
       before_validation Proc.new {|m|

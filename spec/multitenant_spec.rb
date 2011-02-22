@@ -26,7 +26,7 @@ class Company < ActiveRecord::Base
 end
 class User < ActiveRecord::Base
   belongs_to :company
-  belongs_to_tenant :company
+  belongs_to_multitenant :company
 end
 
 class Tenant < ActiveRecord::Base
@@ -34,7 +34,7 @@ class Tenant < ActiveRecord::Base
 end
 class Item < ActiveRecord::Base
   belongs_to :tenant
-  belongs_to_tenant
+  belongs_to_multitenant
 end
 
 describe Multitenant do
