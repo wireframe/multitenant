@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'spec_helper'
 
 ActiveRecord::Schema.define(:version => 1) do
   create_table :companies, :force => true do |t|
