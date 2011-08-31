@@ -25,7 +25,7 @@ module Multitenant
         m.send "#{association}=".to_sym, Multitenant.current_tenant
       }, :on => :create
       default_scope lambda {
-        where({reflection.primary_key_name => Multitenant.current_tenant.id}) if Multitenant.current_tenant
+        where({reflection.foreign_key => Multitenant.current_tenant.id}) if Multitenant.current_tenant
       }
     end
   end
