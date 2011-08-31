@@ -121,5 +121,4 @@ describe Multitenant do
       @user.company_id.should == @company.id
     end
   end
-
 end

@@ -14,9 +14,10 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "multitenant"
 
-  s.add_dependency(%q<activerecord>, ['~>3.1.rc1'])
+  s.add_dependency(%q<activerecord>, ['>= 3.1'])
   s.add_development_dependency(%q<sqlite3>, ["~> 1.3.3"])
-  s.add_development_dependency(%q<rspec>, ['~>2.6.0'])
+  s.add_development_dependency(%q<rspec>, ['~> 2.6.0'])
+  s.add_development_dependency(%q<rspec-core>, ['~> 2.6.4'])
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
