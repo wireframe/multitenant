@@ -10,7 +10,6 @@ ActiveRecord::Schema.define(:version => 1) do
     t.column :company_id, :integer
   end
 
-
   create_table :tenants, :force => true do |t|
     t.column :name, :string
   end
@@ -39,7 +38,32 @@ end
 
 describe Multitenant do
   after { Multitenant.current_tenant = nil }
+  
+  it "shouldn't fail when no models defined" do
+    models_backup = []
+    Multitenant.instance_eval do
+      models_backup = @models
+      @models = nil
+    end
+    Multitenant.with_tenant @foo do
+    end
+    
+    Multitenant.instance_eval do
+      @models = models_backup
+    end
+  end
 
+  it "should allow changing the tenant if it's nil" do
+    user = User.create! :name => 'foo_user'
+
+    Multitenant.with_tenant @foo do
+      user.company = @foo
+      user.save
+      user.reload
+      user.company.should == @foo
+    end
+  end
+  
   describe 'Multitenant.current_tenant' do
     before { Multitenant.current_tenant = :foo }
     it { Multitenant.current_tenant == :foo }
@@ -79,6 +103,80 @@ describe Multitenant do
     end    
   end
 
+  describe 'Aggressive Multitenant' do
+    describe "When in tenant scope should create objects correctly" do
+      before do
+        @company = Company.create! :name => "bar"
+        @company2 = Company.create! :name => "foo"
+
+        Multitenant.with_tenant @company do
+          @user = User.create! :name => "bar user"
+        end
+      end
+
+      it "should not fail new operation but should set correct tenant" do
+        Multitenant.with_tenant @company do
+          user = User.new :name => "bar user 2"
+          user.save.should be_true
+          user.company.should == @company
+        end
+      end
+
+      it "should set the tenant on new objects" do
+        @user.company_id.should == @company.id
+      end
+
+      it "should prevent changing the tenant id through assigment to id" do
+        pending "read only not implemented yet due to bugs"
+        @user.company_id = @company2.id
+        @user.company.should == @company
+        @user.save.should be_true
+        @user.company_id.should == @company.id
+        @user.reload
+        @user.company_id.should == @company.id
+      end
+
+      it "should prevent changing the tenant id through direct assigment" do
+        pending "read only not implemented yet due to bugs"
+        @user.company = @company2
+        @user.company.should == @company
+        @user.save.should be_true
+        @user.company_id.should == @company.id
+        @user.reload
+        @user.company_id.should == @company.id
+      end
+
+     it "should allow setting company through association" do
+        user = User.create! :name => "test"
+        user.company = @company2
+        user.save.should be_true
+      end
+    end
+
+    describe "When current tenant is set" do
+      before do
+        @company = Company.create! :name => "foo"
+        @company2 = Company.create! :name => "bar"
+        @user = @company.users.create! :name => "foo user"
+        @user2 = @company2.users.create! :name => "bar user"
+
+        Multitenant.current_tenant = @company
+      end
+
+      it "should throw exception in case of getting objects from different tenant" do
+        lambda { @user_reload = User.find @user2.id; }.should raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "should prevent creating objects for other tenant" do
+        lambda { @company2.users.create! }.should raise_error(Multitenant::AccessException)
+      end
+
+      it "should prevent updating to wrong tenant" do
+        lambda { @user.company = @company2; @user.save }.should raise_error(Multitenant::AccessException)
+      end
+    end
+  end
+  
   describe 'User.all when current_tenant is set' do
     before do
       @company = Company.create!(:name => 'foo')
@@ -108,7 +206,6 @@ describe Multitenant do
     it { @items.length.should == 1 }
     it { @items.should == [@item] }
   end
-
 
   describe 'creating new object when current_tenant is set' do
     before do
