@@ -7,9 +7,14 @@ module Multitenant
 
     # execute a block scoped to the current tenant
     # unsets the current tenant after execution
-    def with_tenant(tenant, &block)
+    # @param [Object] tenant the new current tenant
+    # @param [Hash] options
+    # @option options [Symbol] :became_current_tenant_method (:became_current_tenant) name of the method to call on tenant after it became the current one (and before the block is run)
+    def with_tenant(tenant, options={}, &block)
+      options[:became_current_tenant_method] ||= :became_current_tenant
       previous_tenant = Multitenant.current_tenant
       Multitenant.current_tenant = tenant
+      tenant.send(options[:became_current_tenant_method]) if tenant.respond_to?(options[:became_current_tenant_method])
       yield
     ensure
       Multitenant.current_tenant = previous_tenant
