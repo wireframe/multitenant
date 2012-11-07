@@ -58,7 +58,25 @@ describe Multitenant do
     end
     it 'yields the block' do
       @executed.should == true
-    end    
+    end
+  end
+
+  describe 'Multitenant.with_tenant block with a previous tenant' do
+    before do
+      @previous = :whatever
+      Multitenant.current_tenant = @previous
+      @executed = false
+      Multitenant.with_tenant :foo do
+        Multitenant.current_tenant.should == :foo
+        @executed = true
+      end
+    end
+    it 'resets current_tenant after block runs' do
+      Multitenant.current_tenant.should == @previous
+    end
+    it 'yields the block' do
+      @executed.should == true
+    end
   end
 
   describe 'Multitenant.with_tenant block that raises error' do
