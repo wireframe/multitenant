@@ -11,6 +11,9 @@ accidentally leak data to an unintended audience.
 class User < ActiveRecord::Base
   belongs_to :tenant
   belongs_to_multitenant
+  
+  validates :email, uniqueness: true                    # application-wide uniqueness
+  validates :alias, uniqueness: { scope: :tenant_id }   # tenant-wide uniqueness
 end
 
 Multitenant.with_tenant current_tenant do
