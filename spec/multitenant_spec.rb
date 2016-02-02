@@ -23,6 +23,11 @@ end
 
 class Company < ActiveRecord::Base
   has_many :users
+  attr_accessor :now_is_current_tenant
+
+  def became_current_tenant
+    self.now_is_current_tenant = true
+  end
 end
 class User < ActiveRecord::Base
   belongs_to :company
@@ -41,8 +46,13 @@ describe Multitenant do
   after { Multitenant.current_tenant = nil }
 
   describe 'Multitenant.current_tenant' do
-    before { Multitenant.current_tenant = :foo }
-    it { Multitenant.current_tenant == :foo }
+    before do
+      @company = Company.create!(:name => 'foo')
+      @company.now_is_current_tenant.should == nil
+      Multitenant.current_tenant = @company
+    end
+    it { Multitenant.current_tenant.should == @company }
+    it { @company.now_is_current_tenant.should == true }
   end
 
   describe 'Multitenant.with_tenant block' do
@@ -58,7 +68,25 @@ describe Multitenant do
     end
     it 'yields the block' do
       @executed.should == true
-    end    
+    end
+  end
+
+  describe 'Multitenant.with_tenant block with a previous tenant' do
+    before do
+      @previous = :whatever
+      Multitenant.current_tenant = @previous
+      @executed = false
+      Multitenant.with_tenant :foo do
+        Multitenant.current_tenant.should == :foo
+        @executed = true
+      end
+    end
+    it 'resets current_tenant after block runs' do
+      Multitenant.current_tenant.should == @previous
+    end
+    it 'yields the block' do
+      @executed.should == true
+    end
   end
 
   describe 'Multitenant.with_tenant block that raises error' do
@@ -76,12 +104,13 @@ describe Multitenant do
     end
     it 'yields the block' do
       @executed.should == true
-    end    
+    end
   end
 
   describe 'User.all when current_tenant is set' do
     before do
       @company = Company.create!(:name => 'foo')
+      @company.now_is_current_tenant.should == nil
       @company2 = Company.create!(:name => 'bar')
 
       @user = @company.users.create! :name => 'bob'
@@ -92,6 +121,7 @@ describe Multitenant do
     end
     it { @users.length.should == 1 }
     it { @users.should == [@user] }
+    it { @company.now_is_current_tenant.should == true }
   end
 
   describe 'Item.all when current_tenant is set' do
