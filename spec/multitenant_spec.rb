@@ -87,7 +87,7 @@ describe Multitenant do
       @user = @company.users.create! :name => 'bob'
       @user2 = @company2.users.create! :name => 'tim'
       Multitenant.with_tenant @company do
-        @users = User.all
+        @users = User.all.to_ary
       end
     end
     it { @users.length.should == 1 }
@@ -102,7 +102,7 @@ describe Multitenant do
       @item = @tenant.items.create! :name => 'baz'
       @item2 = @tenant2.items.create! :name => 'booz'
       Multitenant.with_tenant @tenant do
-        @items = Item.all
+        @items = Item.all.to_ary
       end
     end
     it { @items.length.should == 1 }
