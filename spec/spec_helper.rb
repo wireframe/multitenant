@@ -4,6 +4,7 @@ require 'rspec'
 require 'multitenant'
 require 'active_record'
 require 'logger'
+require 'pry'
 
 config = YAML::load(IO.read(File.join(File.dirname(__FILE__), 'database.yml')))
 ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), "debug.log"))

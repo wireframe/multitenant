@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('sqlite3', ["~> 1.3.3"])
   s.add_development_dependency('rspec', ['~> 2.6.0'])
   s.add_development_dependency('rspec-core', ['~> 2.6.4'])
+  s.add_development_dependency('pry')
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
