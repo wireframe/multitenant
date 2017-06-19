@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "multitenant"
 
-  s.add_dependency(%q<activerecord>, ['>= 3.1'])
+  s.add_dependency(%q<activerecord>, ['>= 3.1', '< 5.0.0'])
 
   s.add_development_dependency('rake')
   s.add_development_dependency('sqlite3', ["~> 1.3.3"])
