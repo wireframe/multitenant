@@ -109,6 +109,23 @@ describe Multitenant do
     it { @items.should == [@item] }
   end
 
+  describe 'Item.all when current_tenant is set to the incorrect tenant' do
+    before do
+      Item.delete_all
+      @company = Company.create! :name => 'foo'
+      @tenant  = Tenant.create!(:name => 'foo')
+      @tenant2 = Tenant.create!(:name => 'bar')
+      @item    = @tenant.items.create! :name => 'baz'
+      @item2   = @tenant2.items.create! :name => 'booz'
+
+      Multitenant.with_tenant @company do
+        @items = Item.all.to_ary
+      end
+    end
+    it { @items.length.should == 2 }
+    it { @items.should == [@item, @item2] }
+  end
+
 
   describe 'creating new object when current_tenant is set' do
     before do
