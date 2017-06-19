@@ -87,7 +87,7 @@ describe Multitenant do
       @user = @company.users.create! :name => 'bob'
       @user2 = @company2.users.create! :name => 'tim'
       Multitenant.with_tenant @company do
-        @users = User.all
+        @users = User.all.to_ary
       end
     end
     it { @users.length.should == 1 }
@@ -102,11 +102,28 @@ describe Multitenant do
       @item = @tenant.items.create! :name => 'baz'
       @item2 = @tenant2.items.create! :name => 'booz'
       Multitenant.with_tenant @tenant do
-        @items = Item.all
+        @items = Item.all.to_ary
       end
     end
     it { @items.length.should == 1 }
     it { @items.should == [@item] }
+  end
+
+  describe 'Item.all when current_tenant is set to the incorrect tenant' do
+    before do
+      Item.delete_all
+      @company = Company.create! :name => 'foo'
+      @tenant  = Tenant.create!(:name => 'foo')
+      @tenant2 = Tenant.create!(:name => 'bar')
+      @item    = @tenant.items.create! :name => 'baz'
+      @item2   = @tenant2.items.create! :name => 'booz'
+
+      Multitenant.with_tenant @company do
+        @items = Item.all.to_ary
+      end
+    end
+    it { @items.length.should == 2 }
+    it { @items.should == [@item, @item2] }
   end
 
 
