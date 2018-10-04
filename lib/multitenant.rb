@@ -11,12 +11,11 @@ module Multitenant
     # execute a block scoped to the current tenant
     # unsets the current tenant after execution
     def with_tenant(tenant, &block)
-      Multitenant.previous_tenants ||= []
-      Multitenant.previous_tenants << Multitenant.current_tenant
+      previous_tenant = Multitenant.current_tenant
       Multitenant.current_tenant = tenant
       yield
     ensure
-      Multitenant.current_tenant = Multitenant.previous_tenants.pop
+      Multitenant.current_tenant = previous_tenant
     end
   end
 
