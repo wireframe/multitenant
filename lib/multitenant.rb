@@ -9,6 +9,7 @@ module Multitenant
   
   class << self
     attr_accessor :current_tenant
+    attr_accessor :allow_dangerous_cross_tenants
 
     # execute a block scoped to the current tenant
     # unsets the current tenant after execution
@@ -21,11 +22,13 @@ module Multitenant
     end
 
     def dangerous_cross_tenants(&block)
-      previous_tenant = Multitenant.current_tenant
-      Multitenant.current_tenant = DANGEROUS_CROSS_TENANTS
-      yield
+      previous_value = Multitenant.allow_dangerous_cross_tenants
+      Multitenant.allow_dangerous_cross_tenants = true
+      Multitenant.with_tenant(nil) do
+        yield
+      end
     ensure
-      Multitenant.current_tenant = previous_tenant
+      Multitenant.allow_dangerous_cross_tenants = previous_value
     end
   end
 
@@ -52,13 +55,16 @@ module Multitenant
       }
       
       default_scope -> () {
-        if Multitenant.current_tenant.present? && Multitenant.current_tenant.is_a?(ActiveRecord::Base)
+        if Multitenant.current_tenant.present?
           where({reflection.foreign_key => Multitenant.current_tenant.id})
-        elsif Multitenant.current_tenant == DANGEROUS_CROSS_TENANTS
+        elsif Multitenant.allow_dangerous_cross_tenants == true
           next nil # do nothing
         else
           begin
-            $logger.info(message: 'multitenant account is not defined')
+            # log only requests to app servers
+            if Thread.current[:request_path].present?
+              $logger.info(message: 'multitenant account is not defined', request_path: Thread.current[:request_path])
+            end
             next nil # do nothing
           rescue Exception => e
             next nil # do nothing
