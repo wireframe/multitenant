@@ -66,7 +66,7 @@ module Multitenant
               $logger.info(message: 'multitenant account is not defined', request_path: Thread.current[:request_path])
             end
             next nil # do nothing
-          rescue Exception => e
+          rescue StandardError => e
             next nil # do nothing
           end
         end
