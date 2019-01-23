@@ -4,6 +4,8 @@ require 'active_record'
 module Multitenant
   class AccessException < RuntimeError
   end
+
+  DANGEROUS_CROSS_TENANTS = :dangerous_cross_tenants
   
   class << self
     attr_accessor :current_tenant
@@ -13,6 +15,14 @@ module Multitenant
     def with_tenant(tenant, &block)
       previous_tenant = Multitenant.current_tenant
       Multitenant.current_tenant = tenant
+      yield
+    ensure
+      Multitenant.current_tenant = previous_tenant
+    end
+
+    def dangerous_cross_tenants(&block)
+      previous_tenant = Multitenant.current_tenant
+      Multitenant.current_tenant = DANGEROUS_CROSS_TENANTS
       yield
     ensure
       Multitenant.current_tenant = previous_tenant
@@ -41,8 +51,19 @@ module Multitenant
         raise AccessException, "Trying to update object in to tenant #{tenant.id} while in current_tenant #{Multitenant.current_tenant.id}" unless tenant.id == Multitenant.current_tenant.id
       }
       
-      default_scope lambda {
-        where({reflection.foreign_key => Multitenant.current_tenant.id}) if Multitenant.current_tenant
+      default_scope -> () {
+        if Multitenant.current_tenant.present? && Multitenant.current_tenant.is_a?(ActiveRecord::Base)
+          where({reflection.foreign_key => Multitenant.current_tenant.id})
+        elsif Multitenant.current_tenant == DANGEROUS_CROSS_TENANTS
+          next nil # do nothing
+        else
+          begin
+            $logger.info(message: 'multitenant account is not defined')
+            next nil # do nothing
+          rescue Exception => e
+            next nil # do nothing
+          end
+        end
       }
     end
   end
