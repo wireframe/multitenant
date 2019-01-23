@@ -4,8 +4,6 @@ require 'active_record'
 module Multitenant
   class AccessException < RuntimeError
   end
-
-  DANGEROUS_CROSS_TENANTS = :dangerous_cross_tenants
   
   class << self
     attr_accessor :current_tenant
