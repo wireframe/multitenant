@@ -61,7 +61,11 @@ module Multitenant
           begin
             # log only requests to app servers
             if Thread.current[:request_path].present?
-              $logger.info(message: 'multitenant account is not defined', request_path: Thread.current[:request_path])
+              $logger.info({
+                message: 'multitenant account is not defined',
+                request_path: Thread.current[:request_path],
+                klass: self.to_s
+              })
             end
             next nil # do nothing
           rescue StandardError => e
