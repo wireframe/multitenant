@@ -12,8 +12,8 @@ module Multitenant
     def current_tenant
       ap "********************"
       ap "TENANT: #{Thread.current[CURRENT_TENANT]}"
+      ap "Account ID: #{Thread.current[CURRENT_TENANT].id}" if Thread.current[CURRENT_TENANT].present?
       ap "********************"
-      
       Thread.current[CURRENT_TENANT]
     end
 
@@ -84,6 +84,7 @@ module Multitenant
               $logger.info({
                 message: 'multitenant account is not defined',
                 request_path: Thread.current[:request_path],
+                current_queue: Thread.current[:current_queue],
                 klass: self.to_s
               })
             end
