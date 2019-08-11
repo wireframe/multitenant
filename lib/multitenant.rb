@@ -6,8 +6,28 @@ module Multitenant
   end
   
   class << self
-    attr_accessor :current_tenant
-    attr_accessor :allow_dangerous_cross_tenants
+    CURRENT_TENANT = 'Multitenant.current_tenant'.freeze
+    ALLOW_DANGEROUS = 'Multitenant.allow_dangerous_cross_tenants'.freeze
+
+    def current_tenant
+      ap "********************"
+      ap "TENANT: #{Thread.current[CURRENT_TENANT]}"
+      ap "********************"
+      
+      Thread.current[CURRENT_TENANT]
+    end
+
+    def current_tenant=(value)
+      Thread.current[CURRENT_TENANT] = value
+    end
+
+    def allow_dangerous_cross_tenants
+      Thread.current[ALLOW_DANGEROUS]
+    end
+
+    def allow_dangerous_cross_tenants=(value)
+      Thread.current[ALLOW_DANGEROUS] = value
+    end
 
     # execute a block scoped to the current tenant
     # unsets the current tenant after execution
