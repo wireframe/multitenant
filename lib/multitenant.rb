@@ -76,10 +76,16 @@ module Multitenant
         else
           begin
             # log only requests to app servers
-            if Thread.current[:request_path].present? || Thread.current[:current_queue].present?
+            if Thread.current[:request_path].present?
               $logger.info({
                 message: 'multitenant account is not defined',
                 request_path: Thread.current[:request_path],
+                current_queue: Thread.current[:current_queue],
+                klass: self.to_s
+              })
+            elsif Thread.current[:current_queue].present?
+              $logger.info({
+                message: '[sidekiq] multitenant account is not defined',
                 current_queue: Thread.current[:current_queue],
                 klass: self.to_s
               })
