@@ -10,12 +10,10 @@ module Multitenant
     ALLOW_DANGEROUS = 'Multitenant.allow_dangerous_cross_tenants'.freeze
 
     def current_tenant
-      ap "get tenant"
       Thread.current[CURRENT_TENANT]
     end
 
     def current_tenant=(value)
-      ap "set tenant"
       Thread.current[CURRENT_TENANT] = value
     end
 
