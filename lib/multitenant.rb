@@ -6,8 +6,24 @@ module Multitenant
   end
   
   class << self
-    attr_accessor :current_tenant
-    attr_accessor :allow_dangerous_cross_tenants
+    CURRENT_TENANT = 'Multitenant.current_tenant'.freeze
+    ALLOW_DANGEROUS = 'Multitenant.allow_dangerous_cross_tenants'.freeze
+
+    def current_tenant
+      Thread.current[CURRENT_TENANT]
+    end
+
+    def current_tenant=(value)
+      Thread.current[CURRENT_TENANT] = value
+    end
+
+    def allow_dangerous_cross_tenants
+      Thread.current[ALLOW_DANGEROUS]
+    end
+
+    def allow_dangerous_cross_tenants=(value)
+      Thread.current[ALLOW_DANGEROUS] = value
+    end
 
     # execute a block scoped to the current tenant
     # unsets the current tenant after execution
@@ -64,6 +80,13 @@ module Multitenant
               $logger.info({
                 message: 'multitenant account is not defined',
                 request_path: Thread.current[:request_path],
+                current_queue: Thread.current[:current_queue],
+                klass: self.to_s
+              })
+            elsif Thread.current[:current_queue].present?
+              $logger.info({
+                message: '[sidekiq] multitenant account is not defined',
+                current_queue: Thread.current[:current_queue],
                 klass: self.to_s
               })
             end
