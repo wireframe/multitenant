@@ -83,8 +83,8 @@ module Multitenant
                 current_queue: Thread.current[:current_queue],
                 klass: self.to_s
               })
-            elsif Thread.current[:current_queue].present? && rand(100) == 5
-              #log once in 100 to make less logs
+            elsif Thread.current[:current_queue].present? && rand(1000) == 5
+              #log once in 1000 to make less logs
               $logger.info({
                 message: '[sidekiq] multitenant account is not defined',
                 current_queue: Thread.current[:current_queue],
