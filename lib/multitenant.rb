@@ -65,7 +65,7 @@ module Multitenant
       # Prevent updating objects to a different tenant
       before_save Proc.new {|m|
         next unless Multitenant.current_tenant
-        tenant_id = m.send association_key
+        tenant_id = m.send association_key.to_sym
         raise AccessException, "Trying to update object in to tenant #{tenant_id} while in current_tenant #{Multitenant.current_tenant.id}" unless tenant_id == Multitenant.current_tenant.id
       }
       
