@@ -51,26 +51,27 @@ module Multitenant
     # see Multitenant#current_tenant
     def belongs_to_multitenant(association = :tenant)
       reflection = reflect_on_association association
+      association_key = reflection.foreign_key.to_s
       before_validation Proc.new {|m|
         next unless Multitenant.current_tenant
-        tenant = m.send "#{association}"
-        if tenant.nil? then
+        tenant_id = m.send association_key
+        if tenant_id.nil? then
           m.send "#{association}=".to_sym, Multitenant.current_tenant
-        elsif tenant.id != Multitenant.current_tenant.id
-          raise AccessException, "Can't create a new instance for tenant #{tenant.id} while Multitenant.current_tenant is #{Multitenant.current_tenant.id}"
+        elsif tenant_id != Multitenant.current_tenant.id
+          raise AccessException, "Can't create a new instance for tenant #{tenant_id} while Multitenant.current_tenant is #{Multitenant.current_tenant.id}"
         end          
       }, :on => :create
       
       # Prevent updating objects to a different tenant
       before_save Proc.new {|m|
         next unless Multitenant.current_tenant
-        tenant = m.send "#{association}".to_sym
-        raise AccessException, "Trying to update object in to tenant #{tenant.id} while in current_tenant #{Multitenant.current_tenant.id}" unless tenant.id == Multitenant.current_tenant.id
+        tenant_id = m.send association_key.to_sym
+        raise AccessException, "Trying to update object in to tenant #{tenant_id} while in current_tenant #{Multitenant.current_tenant.id}" unless tenant_id == Multitenant.current_tenant.id
       }
       
       default_scope -> () {
         if Multitenant.current_tenant.present?
-          where({reflection.foreign_key => Multitenant.current_tenant.id})
+          where({association_key => Multitenant.current_tenant.id})
         elsif Multitenant.allow_dangerous_cross_tenants == true
           next nil # do nothing
         else
@@ -83,8 +84,8 @@ module Multitenant
                 current_queue: Thread.current[:current_queue],
                 klass: self.to_s
               })
-            elsif Thread.current[:current_queue].present? && rand(1000) == 5
-              #log once in 1000 to make less logs
+            elsif Thread.current[:current_queue].present? && rand(100) == 5
+              #log once in 100 to make less logs
               $logger.info({
                 message: '[sidekiq] multitenant account is not defined',
                 current_queue: Thread.current[:current_queue],
