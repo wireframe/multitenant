@@ -8,6 +8,7 @@ module Multitenant
   class << self
     CURRENT_TENANT = 'Multitenant.current_tenant'.freeze
     ALLOW_DANGEROUS = 'Multitenant.allow_dangerous_cross_tenants'.freeze
+    EXTRA_TENANT_IDS = 'Multitenant.extra_tenant_ids'.freeze
 
     def current_tenant
       Thread.current[CURRENT_TENANT]
@@ -25,14 +26,25 @@ module Multitenant
       Thread.current[ALLOW_DANGEROUS] = value
     end
 
+    def extra_tenant_ids
+      Thread.current[EXTRA_TENANT_IDS]
+    end
+
+    def extra_tenant_ids=(value)
+      Thread.current[EXTRA_TENANT_IDS] = value
+    end
+
     # execute a block scoped to the current tenant
     # unsets the current tenant after execution
-    def with_tenant(tenant, &block)
+    def with_tenant(tenant, options = {}, &block)
       previous_tenant = Multitenant.current_tenant
       Multitenant.current_tenant = tenant
+      previous_extra_tenant_ids = Multitenant.extra_tenant_ids
+      Multitenant.extra_tenant_ids = options[:extra_tenant_ids] if options[:extra_tenant_ids]
       yield
     ensure
       Multitenant.current_tenant = previous_tenant
+      Multitenant.extra_tenant_ids = previous_extra_tenant_ids
     end
 
     def dangerous_cross_tenants(&block)
@@ -71,7 +83,8 @@ module Multitenant
       
       default_scope -> () {
         if Multitenant.current_tenant.present?
-          where({association_key => Multitenant.current_tenant.id})
+          tenant_ids = Multitenant.extra_tenant_ids.present? ? Multitenant.extra_tenant_ids + [Multitenant.current_tenant.id] : Multitenant.current_tenant.id
+          where({association_key => tenant_ids})
         elsif Multitenant.allow_dangerous_cross_tenants == true
           next nil # do nothing
         else
