@@ -69,10 +69,12 @@ module Multitenant
         tenant_id = m.send association_key
         if tenant_id.nil? then
           m.send "#{association}=".to_sym, Multitenant.current_tenant
+
+          if Thread.current[:unauthenticated_route]
+            $logger.info(message: 'account_id was assigned by multitenant in an unauthenticated route')
+          end
         elsif tenant_id != Multitenant.current_tenant.id
           raise AccessException, "Can't create a new instance for tenant #{tenant_id} while Multitenant.current_tenant is #{Multitenant.current_tenant.id}"
-        elsif Thread.current[:unauthenticated_route]
-          $logger.info(message: 'account_id was assigned by multitenant in an unauthenticated route')
         end          
       }, :on => :create
       
