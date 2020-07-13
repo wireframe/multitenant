@@ -112,11 +112,11 @@ module Multitenant
                 current_queue: Thread.current[:current_queue],
                 klass: self.to_s
               })
-              raise SidekiqMultitenantError
+              #raise SidekiqMultitenantError
             end
             next nil # do nothing
-          rescue SidekiqMultitenantError => e
-            raise e
+          # rescue SidekiqMultitenantError => e
+          #   raise e
           rescue StandardError => e
             next nil # do nothing
           end
@@ -127,8 +127,8 @@ module Multitenant
 end
 ActiveRecord::Base.extend Multitenant::ActiveRecordExtensions
 
-class SidekiqMultitenantError < StandardError
-  def message
-    '[sidekiq] multitenant account is not defined'
-  end
-end
+# class SidekiqMultitenantError < StandardError
+#   def message
+#     '[sidekiq] multitenant account is not defined'
+#   end
+# end
