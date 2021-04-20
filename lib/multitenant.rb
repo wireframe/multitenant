@@ -3,7 +3,13 @@ require 'active_record'
 # Multitenant: making cross tenant data leaks a thing of the past...since 2011
 module Multitenant
   class << self
-    attr_accessor :current_tenant
+    def current_tenant=(value)
+      Thread.current[:current_tenant] = value
+    end
+
+    def current_tenant
+      Thread.current[:current_tenant]
+    end
 
     # execute a block scoped to the current tenant
     # unsets the current tenant after execution
