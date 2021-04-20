@@ -43,6 +43,22 @@ describe Multitenant do
   describe 'Multitenant.current_tenant' do
     before { Multitenant.current_tenant = :foo }
     it { Multitenant.current_tenant == :foo }
+    it 'accesses current_tenant in thread safe manner' do
+      in_tenants = [:foo, :bar, :tar]
+      out_tenants = []
+      threads = []
+
+      count = 2
+      count.times do |i|
+        threads << Thread.new(i) do |index|
+          Multitenant.current_tenant = in_tenants[i+1]
+          out_tenants[i+1] = Multitenant.current_tenant
+        end
+      end
+      threads.each(&:join)
+      out_tenants[0] = Multitenant.current_tenant
+      out_tenants.should == in_tenants
+    end
   end
 
   describe 'Multitenant.with_tenant block' do
