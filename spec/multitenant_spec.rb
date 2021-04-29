@@ -45,6 +45,15 @@ describe Multitenant do
     it { Multitenant.current_tenant == :foo }
   end
 
+  describe '#current_tenant=' do
+    it 'is threadsafe' do
+      Multitenant.current_tenant = :old_tenant
+      overwriter = Thread.new { Multitenant.current_tenant = :new_tenant }
+      overwriter.join
+      Multitenant.current_tenant.should == :old_tenant
+    end
+  end
+
   describe 'Multitenant.with_tenant block' do
     before do
       @executed = false
